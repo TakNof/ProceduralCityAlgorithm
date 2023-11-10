@@ -38,11 +38,18 @@ scene.background = new THREE.CubeTextureLoader()
         'nz.png'
 	]);
 
+let buildingTextures = new Array(6);
+
+for(let i = 0; i < buildingTextures.length; i++){
+    buildingTextures[i] = {map: createTexture(`buildingAssets/texture${i+1}/albedo.jpg`), normalMap: createTexture(`buildingAssets/texture${i+1}/normals.jpg`)};
+}
+
+let roadTextures = {map: createTexture(`roadAssets/texture1/albedo.jpg`), normalMap: createTexture(`roadAssets/texture1/normals.jpg`)}
 
 let citySize = {width: 200, depth: 200, height: 10};
 let buildingsSize = {width: 5, depth:5, height: citySize.height};
 
-let city = new ProceduralCityGenerator(scene, citySize, buildingsSize);
+let city = new ProceduralCityGenerator(scene, citySize, buildingsSize, buildingTextures, roadTextures);
 city.setRoads(50);
 city.create();
 
@@ -62,6 +69,15 @@ function animate() {
     controls.update();
 }
 animate();
+
+function createTexture(rute, height = 1, width = 1){
+    let texture = new THREE.TextureLoader().load(rute);
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+    texture.repeat.set(height, width); 
+
+    return texture;
+}
 
 function createLight(color, intensity, position = {x: 0, y: 0, z: 0}){
     let light = new THREE.PointLight(color, intensity);

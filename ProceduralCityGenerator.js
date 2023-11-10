@@ -7,18 +7,24 @@ class ProceduralCityGenerator{
     #buildingsSize;
     #amountOfBuildings;
     #distributionMatrix;
+    #buildingTextures;
+    #roadTextures;
 
     /**
      * 
      * @param {THREE.Scene} scene 
      * @param {Object} citySize 
-     * @param {Object} buildingsSize 
+     * @param {Object} buildingsSize
+     * @param {Object} buildingTextures
+     * @param {Object} roadTextures
      * @returns 
      */
-    constructor(scene, citySize, buildingsSize){
+    constructor(scene, citySize, buildingsSize, buildingTextures, roadTextures){
         this.#scene = scene;
         this.#citySize = citySize;
         this.#buildingsSize = buildingsSize;
+        this.#buildingTextures = buildingTextures;
+        this.#roadTextures = roadTextures;
 
         this.#amountOfBuildings = {width: 0, depth: 0, height: 0};
 
@@ -50,9 +56,9 @@ class ProceduralCityGenerator{
     }
 
     setRoads(amount){
-        // while(amount > this.getDistributionMatrix().rows || amount > this.getDistributionMatrix().columns){
-        //     amount /= 2;
-        // }
+        while(amount > this.getDistributionMatrix().rows || amount > this.getDistributionMatrix().columns){
+            amount /= 2;
+        }
 
         let functionsToCreateRoads = ["linealCreation", "radialCreation"];
 
@@ -168,23 +174,38 @@ class ProceduralCityGenerator{
 
     create(){
         let colours = [0x03cffc, 0x09ff00, 0xff8800, 0xff00e1];
-
+        
         for(let i = 0; i < this.getDistributionMatrix().rows - 1; i++){
             for(let j = 0; j < this.getDistributionMatrix().columns - 1; j++){
+                let configBuilding;
+                if(this.#buildingTextures){
+                    configBuilding = this.#buildingTextures[this.#rand(0, this.#buildingTextures.length -1)];
+                }else{
+                    configBuilding = {color: colours[this.#rand(0, colours.length -1)]};
+                }
+
+                let configRoad;
+
+                if(this.#roadTextures){
+                    configRoad = this.#roadTextures;
+                }else{
+                    configRoad = {color: 0x383b39}
+                }
+
                 let cube;
                 if(this.getDistributionMatrix().array[i][j] == 1){
                     cube = new ShapeGenerator(
                         "Cube", 
                         [this.getBuildingsSize().width, this.getBuildingsSize().height/10, this.getBuildingsSize().depth], 
                         "Standard", 
-                        {color: 0x383b39}
+                        configRoad
                     );
                 }else{
                     cube = new ShapeGenerator(
                         "Cube", 
                         [this.getBuildingsSize().width, this.#rand(this.getBuildingsSize().height/2, this.getBuildingsSize().height), this.getBuildingsSize().depth], 
                         "Standard", 
-                        {color: colours[this.#rand(0, colours.length -1)]}
+                        configBuilding
                     );
                 }
 
